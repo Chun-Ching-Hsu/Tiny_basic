@@ -1,4 +1,4 @@
-# write append read rem 作用是什麼啊？
+# write append read  作用是什麼啊？
 #20220403 新增 >> , << 
 #20220404 新增 字串相加
 #20220405 新增 for loop 格式{ for 已知變數/未知變數 = val/數值(運算) to 數值(運算) step 數值 }
@@ -7,6 +7,7 @@
 #   next
 VERSION = 1
 #第一行的command 有hander處理
+#rem 是註解行
 reserved = ["LET", "PRINT", "INPUT", "IF", "GOTO","FOR","NEXT","EXITFOR",
             "SLEEP", "END", "LIST", "REM", "READ",
             "WRITE", "APPEND", "RUN", "CLS", "CLEAR",
