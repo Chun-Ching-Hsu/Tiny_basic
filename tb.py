@@ -3,12 +3,19 @@
 #20220404 新增 字串相加
 #20220405 新增 for loop 格式{ for 已知變數/未知變數 = val/數值(運算) to 數值(運算) step 數值 }
 #EX for x = 0 to 5 step 1 
-#   ......( 可以有exitfor )
+#    ......( 可以有exitfor )
 #   next
+#20220423 新增gosub return (可以巢狀) 
+#Ex gosub 行號
+#    ....
+#   return 
+from operator import truediv
+
+
 VERSION = 1
 #第一行的command 有hander處理
 #rem 是註解行
-reserved = ["LET", "PRINT", "INPUT", "IF", "GOTO","FOR","NEXT","EXITFOR",
+reserved = ["LET", "PRINT", "INPUT", "IF", "GOTO","FOR","NEXT","EXITFOR","GOSUB","RETURN",
             "SLEEP", "END", "LIST", "REM", "READ",
             "WRITE", "APPEND", "RUN", "CLS", "CLEAR",
             "EXIT"]
@@ -28,6 +35,8 @@ forLines = []
 step = []
 forValL = []
 forValR = []
+gosubLines = []
+
 def main():
     print(f"Tiny BASIC version {VERSION}\nby Chung-Yuan Huang")
     while True:
@@ -84,6 +93,7 @@ def lex(line):
     x   ID
     =   ASGN
     10  NUM
+    tokens = [[let,TBD]]
     """
     inString = False
     tokens = []
@@ -207,12 +217,32 @@ def executeTokens(tokens):
             if not(nextHandler(tokens[1:])): stopExecution = True
         elif command == "EXITFOR":
             if not(exitforHandler()): stopExecution = True
-
+        elif command == "GOSUB":
+            if not(gosubHander(tokens[1:])): stopExecution = True
+        elif command == "RETURN":
+            if not(returnHander()): stopExecution = True
 def getNumberPrintFormat(num):
     # 如果是整數轉int 其他保持小數不變
     if int(num) == float(num):
         return int(num)
     return 
+#----------------------這裡是 gosub and return 部分 :) ---------------------------
+def returnHander():
+    global gosubLines,linePointer
+    if gosubLines :
+        linePointer = int(gosubLines.pop())
+    else:
+        linePointer = linePointer
+    return True
+def gosubHander(tokens):
+    global linePointer,gosubLines,lines
+    if tokens[0][0] in lines:
+        gosubLines.append(linePointer)
+        linePointer = int(tokens[0][0]-1)
+        return True
+    else :
+        print ("Error: value of GOSUB statement is not find.")
+        return False
 #................從這裡開使都是for用到的function，不是老師原本的，可以不用看><.......................    
 def exitforHandler():
     global linePointer,lines,forLines,forValL,forValR,step
