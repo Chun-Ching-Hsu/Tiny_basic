@@ -26,6 +26,7 @@ operators = [["==", "!=", ">", "<", ">=", "<="],
              ["*", "/", "&", "|", "%"],
              ["^"]]
 lines = {}  #暫存命令列 行號是key index 是 [命令,type]
+array = {}  #儲存array  key是名稱 index 是[]
 maxLine = 0
 linePointer = 0
 stopExecution = False
@@ -36,6 +37,7 @@ step = []
 forValL = []
 forValR = []
 gosubLines = []
+
 
 def main():
     print(f"Tiny BASIC version {VERSION}\nby Chung-Yuan Huang")
@@ -225,7 +227,7 @@ def getNumberPrintFormat(num):
     # 如果是整數轉int 其他保持小數不變
     if int(num) == float(num):
         return int(num)
-    return 
+    return num
 #----------------------這裡是 gosub and return 部分 :) ---------------------------
 def returnHander():
     global gosubLines,linePointer
