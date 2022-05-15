@@ -1,10 +1,11 @@
-1 let x = 5
-2 while x < 9
-3 print x
-4 while x < 7 
-5 print 100
-6 let x = x + 1
+1 let x = 1
+2 let y = 1
+3 while x < 10
+4 while y < 10
+5 print x * y
+6 let y = y + 1
 7 wend
-8 let x = x + 1
-9 wend 
-10 print "已完成"
+8 let y = 1 
+9 let x = x + 1
+10 wend
+11 print "END"

@@ -40,7 +40,7 @@ step = []
 forValL = []
 forValR = []
 gosubLines = []
-whileLine = []
+whileLine = {}
 
 
 def main():
@@ -231,7 +231,7 @@ def executeTokens(tokens):
             if not(whileHandler(tokens[1:])): 
                 stopExecution = True
         elif command == "WEND":
-            if not(wendHandler(tokens[1:])):stopExecution = True
+            if not(wendHandler()):stopExecution = True
 def getNumberPrintFormat(num):
     # 如果是整數轉int 其他保持小數不變
     if int(num) == float(num):
@@ -241,26 +241,34 @@ def getNumberPrintFormat(num):
 def whileHandler(tokens):
     global whileLine,linePointer,lines,maxLine
     val_bool = solveExpression(tokens,0)# 回傳[bool,'NUM']
-    if(val_bool[0]):
-        whileLine.append(linePointer)
-        return True
-    elif(not val_bool[0]):
-        while(True):
-            if linePointer in lines:
-                if lines[linePointer][0][0] == 'WEND':
-                    lines[linePointer][0][0] = 'FINISH'
-                    return True
-            linePointer = linePointer +1
-            if linePointer > maxLine:
+    tmpline = linePointer + 1
+    count = 0
+    while linePointer not in whileLine:
+        if tmpline in lines:
+            if lines[tmpline][0][0] == 'WHILE':
+                count = count + 1
+            if lines[tmpline][0][0] == 'WEND':
+                if count == 0:
+                    whileLine[linePointer] = tmpline
+                    break
+                else:
+                    count = count - 1
+            if  tmpline > maxLine :
                 print ("Error:Expected WEND statement.")
                 return False
-        return True
-    return False
-def wendHandler(tokens):
+        tmpline = tmpline + 1
+    if(not val_bool[0]):
+       linePointer = whileLine[linePointer]
+    return True
+def wendHandler():
     global linePointer,whileLine
     if whileLine :
-        linePointer = whileLine.pop()-1
-        return True
+        for key in whileLine.keys():
+            if whileLine[key] == linePointer:
+                linePointer = key - 1
+                return True
+        return False
+
     else :
         print("Error:Expected WHILE before statement.")
         return False
