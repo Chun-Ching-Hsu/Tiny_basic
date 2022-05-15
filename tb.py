@@ -276,6 +276,7 @@ def wendHandler():
 def returnHander():
     global gosubLines,linePointer
     if gosubLines :
+        #print(gosubLines)
         linePointer = int(gosubLines.pop())
     else:
         linePointer = linePointer
