@@ -9,7 +9,7 @@
 #Ex gosub 行號
 #    ....
 #   return 
-#20220513 新增while loop 格式{while 判斷式}
+#20220515 新增while loop 格式{while 判斷式} (不能是bool) 且要有 Wend(可以巢狀)
 #EX while a > 1
 #   ......
 #   Wend
