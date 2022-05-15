@@ -1,0 +1,10 @@
+1 let x = 5
+2 while x < 8
+3 print x
+4 while x < 7 
+5 print 100
+6 let x = x + 1
+7 wend
+8 let x = x + 1
+9 wend 
+10 print 10

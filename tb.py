@@ -9,13 +9,16 @@
 #Ex gosub 行號
 #    ....
 #   return 
+#20220513 新增while loop 格式{while 判斷式}
+#EX while a > 1
+#   ......
+#   Wend
 from operator import truediv
-
-
 VERSION = 1
 #第一行的command 有hander處理
 #rem 是註解行
 reserved = ["LET", "PRINT", "INPUT", "IF", "GOTO","FOR","NEXT","EXITFOR","GOSUB","RETURN",
+            "WHILE","WEND",
             "SLEEP", "END", "LIST", "REM", "READ",
             "WRITE", "APPEND", "RUN", "CLS", "CLEAR",
             "EXIT"]
@@ -37,6 +40,7 @@ step = []
 forValL = []
 forValR = []
 gosubLines = []
+whileLine = []
 
 
 def main():
@@ -223,11 +227,43 @@ def executeTokens(tokens):
             if not(gosubHander(tokens[1:])): stopExecution = True
         elif command == "RETURN":
             if not(returnHander()): stopExecution = True
+        elif command == "WHILE":
+            if not(whileHandler(tokens[1:])): 
+                stopExecution = True
+        elif command == "WEND":
+            if not(wendHandler(tokens[1:])):stopExecution = True
 def getNumberPrintFormat(num):
     # 如果是整數轉int 其他保持小數不變
     if int(num) == float(num):
         return int(num)
     return num
+#---------------------- while 迴圈 ----------------------------------
+def whileHandler(tokens):
+    global whileLine,linePointer,lines,maxLine
+    val_bool = solveExpression(tokens,0)# 回傳[bool,'NUM']
+    if(val_bool[0]):
+        whileLine.append(linePointer)
+        return True
+    elif(not val_bool[0]):
+        while(True):
+            if linePointer in lines:
+                if lines[linePointer][0][0] == 'WEND':
+                    lines[linePointer][0][0] = 'FINISH'
+                    return True
+            linePointer = linePointer +1
+            if linePointer > maxLine:
+                print ("Error:Expected WEND statement.")
+                return False
+        return True
+    return False
+def wendHandler(tokens):
+    global linePointer,whileLine
+    if whileLine :
+        linePointer = whileLine.pop()-1
+        return True
+    else :
+        print("Error:Expected WHILE before statement.")
+        return False
 #----------------------這裡是 gosub and return 部分 :) ---------------------------
 def returnHander():
     global gosubLines,linePointer
