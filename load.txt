@@ -1,0 +1,4 @@
+1 LET a = 100
+2 LET b = 10
+3 LET c = 1
+4 LET d = 0
