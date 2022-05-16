@@ -21,7 +21,7 @@ reserved = ["LET", "PRINT", "INPUT", "IF", "GOTO","FOR","NEXT","EXITFOR","GOSUB"
             "WHILE","WEND",
             "SLEEP", "END", "LIST", "REM", "READ",
             "WRITE", "APPEND", "RUN", "CLS", "CLEAR",
-            "EXIT"]
+            "EXIT", "SAVE", "LOAD"]
 #op 有優先順序 分開左右,在判斷式中.越下面順位越高 類似語法樹
 operators = [["==", "!=", ">", "<", ">=", "<="],
              ["."],
@@ -180,6 +180,10 @@ def executeTokens(tokens):
             maxLine = 0
             lines = {}
             identifiers = {}
+        elif command == "SAVE":
+            if not(saveHandler(tokens[1:])): stopExecution = True
+        elif command == "LOAD":
+            if not(loadHandler(tokens[1:])): stopExecution = True
         elif command == "LIST":
             i = 0
             while i <= maxLine:
@@ -232,6 +236,43 @@ def executeTokens(tokens):
                 stopExecution = True
         elif command == "WEND":
             if not(wendHandler()):stopExecution = True
+#-----------------------------------------存檔----------------------------------
+def saveHandler(tokens):
+    i = 0
+    filename = tokens[0][0]
+    f = open(filename, 'w')
+    while i <= maxLine:
+        if i in lines:
+            line = str(i)
+            for token in lines[i]:
+                tokenVal = "",
+                if token[1] == "NUM":
+                    tokenVal = getNumberPrintFormat(token[0])
+                elif token[1] == "STRING":
+                    tokenVal = f"\"{token[0]}\""
+                else:
+                    tokenVal = token[0]
+                line += " " + str(tokenVal)
+            f.write(line)
+            f.write('\n')
+        i = i + 1
+    f.close()
+    return True
+#-----------------------------------------讀檔-----------------------------
+def loadHandler(tokens):
+    #print(tokens[0][0])
+    global maxLine, lines, identifiers
+    maxLine = 0
+    lines = {}
+    identifiers = {}
+    filename = tokens[0][0]
+    f = open(filename, 'r')
+    for line in f.readlines():
+        if len(line) > 0:
+            executeTokens(lex(line))
+    f.close()
+    return True
+#-------------------------------------------------------------------------------
 def getNumberPrintFormat(num):
     # 如果是整數轉int 其他保持小數不變
     if int(num) == float(num):
