@@ -13,7 +13,11 @@
 #EX while a > 1
 #   ......
 #   Wend
+#20220515 新增 SIN() COS() ABS()
+
 from operator import truediv
+from math import cos, sin
+
 VERSION = 1
 #第一行的command 有hander處理
 #rem 是註解行
@@ -28,6 +32,7 @@ operators = [["==", "!=", ">", "<", ">=", "<="],
              ["+", "-" ,">>","<<"],
              ["*", "/", "&", "|", "%"],
              ["^"]]
+MathFunction = ["SIN", "COS", "ABS"]
 lines = {}  #暫存命令列 行號是key index 是 [命令,type]
 array = {}  #儲存array  key是名稱 index 是[]
 maxLine = 0
@@ -130,6 +135,9 @@ def lex(line):
             #確認是不是在reserved中，有的話轉大寫
             token[0] = value.upper()
             token[1] = "RESVD" #Reserved word
+        elif value.upper() in MathFunction:
+            token[0] = value.upper()
+            token[1] = "MF" #Math Function
         elif value.upper() == "THEN":
             token[0] = value.upper()
             token[1] = "THEN"
@@ -545,9 +553,22 @@ def solveExpression(tokens, level):
     rightSideValues = []
     if level < len(operators):
         for i in range(0, len(tokens)):
-            if not(tokens[i][1] in ["OP", "NUM", "STRING", "ID"]):
+            if not(tokens[i][1] in ["OP", "NUM", "STRING", "ID", "MF"]):
                 print(f"Error: Unknown operand {tokens[i][0]}")
                 return None
+            elif tokens[i][1] == "MF" and tokens[i][0] in MathFunction[level]:
+                if tokens[i+1][1] != "NUM":
+                    print("Error: NUM expects value in ABS().")
+                    return None
+                if tokens[i][0] == "ABS":
+                    leftSideValues.append([abs(tokens[i+1][0]), "NUM"])
+                    i=i+1
+                elif tokens[i][0] == "SIN":
+                    leftSideValues.append([sin(tokens[i+1][0]), "NUM"])
+                    i=i+1
+                elif tokens[i][0] == "COS":
+                    leftSideValues.append([cos(tokens[i+1][0]), "NUM"])
+                    i=i+1
             elif tokens[i][1] == "OP" and tokens[i][0] in operators[level]:
                 exprResL = None
                 exprResR = None
@@ -704,10 +725,7 @@ def solveExpression(tokens, level):
                 leftSideValues.append(tokens[i])
         return solveExpression(leftSideValues, level + 1)
     else:
-        if len(tokens) > 1:
-            print("Error: Operator expected.")
-            return None
-        elif tokens[0][1] == "ID":
+        if tokens[0][1] == "ID":
             if tokens[0][0] in identifiers:
                 return getIdentifierValue(tokens[0][0])
             else:
