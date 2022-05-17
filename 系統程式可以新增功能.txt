@@ -1,0 +1,5 @@
+save load(read write) 
+bool,float  
+abs,cos,sin
+if else elif 
+while end
