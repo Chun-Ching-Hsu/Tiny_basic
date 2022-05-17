@@ -248,6 +248,8 @@ def executeTokens(tokens):
 def saveHandler(tokens):
     i = 0
     filename = tokens[0][0]
+    if not filename.lower().endswith(".txt") or not filename.lower().endswith(".tb"):
+        filename += ".tb"
     f = open(filename, 'w')
     while i <= maxLine:
         if i in lines:
@@ -274,6 +276,8 @@ def loadHandler(tokens):
     lines = {}
     identifiers = {}
     filename = tokens[0][0]
+    if not filename.lower().endswith(".txt") or not filename.lower().endswith(".tb"):
+        filename += ".tb"
     f = open(filename, 'r')
     for line in f.readlines():
         if len(line) > 0:
