@@ -14,6 +14,7 @@
 #   ......
 #   Wend
 #20220515 新增 SIN() COS() ABS()
+#20220517 新增&修改SAVE LOAD 
 
 from operator import truediv
 from math import cos, sin
@@ -248,7 +249,8 @@ def executeTokens(tokens):
 def saveHandler(tokens):
     i = 0
     filename = tokens[0][0]
-    if not filename.lower().endswith(".txt") or not filename.lower().endswith(".tb"):
+    #如果沒有標註附檔名，就都改.tb檔
+    if "." not in filename:
         filename += ".tb"
     f = open(filename, 'w')
     while i <= maxLine:
@@ -276,7 +278,8 @@ def loadHandler(tokens):
     lines = {}
     identifiers = {}
     filename = tokens[0][0]
-    if not filename.lower().endswith(".txt") or not filename.lower().endswith(".tb"):
+    #如果沒有標註附檔名，就都改.tb檔
+    if "." not in filename:
         filename += ".tb"
     f = open(filename, 'r')
     for line in f.readlines():
