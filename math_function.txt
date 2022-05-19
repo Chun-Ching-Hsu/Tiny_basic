@@ -1,5 +1,0 @@
-1 LET X = ABS(-10) + 3
-2 PRINT X
-3 LET Y = 5 + COS(0) + SIN(5)
-4 PRINT Y
-RUN
