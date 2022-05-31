@@ -13,7 +13,7 @@
 #EX while a > 1
 #   ......
 #   Wend
-#20220515 新增 SIN() COS() ABS()
+#20220515 新增 SIN() COS() ABS() 是 rad 
 #20220517 新增&修改SAVE LOAD 
 
 from operator import truediv
@@ -565,7 +565,7 @@ def solveExpression(tokens, level):
                 return None
             elif tokens[i][1] == "MF" and tokens[i][0] in MathFunction[level]:
                 if tokens[i+1][1] != "NUM":
-                    print("Error: NUM expects value in ABS().")
+                    print("Error: NUM expects value in ().")
                     return None
                 if tokens[i][0] == "ABS":
                     leftSideValues.append([abs(tokens[i+1][0]), "NUM"])
