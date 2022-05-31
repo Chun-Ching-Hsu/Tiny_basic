@@ -13,8 +13,10 @@
 #EX while a > 1
 #   ......
 #   Wend
-#20220515 新增 SIN() COS() ABS() 是 rad 
-#20220517 新增&修改SAVE LOAD 
+#20220515 新增 SIN() COS() ABS() 是 rad
+#20220517 新增 BOOL X?
+#20220519 新增 STOP
+#20220519 新增 FLOAT X@
 
 from operator import truediv
 from math import cos, sin
@@ -26,7 +28,7 @@ reserved = ["LET", "PRINT", "INPUT", "IF", "GOTO","FOR","NEXT","EXITFOR","GOSUB"
             "WHILE","WEND",
             "SLEEP", "END", "LIST", "REM", "READ",
             "WRITE", "APPEND", "RUN", "CLS", "CLEAR",
-            "EXIT", "SAVE", "LOAD"]
+            "EXIT", "SAVE", "LOAD", "STOP"]
 #op 有優先順序 分開左右,在判斷式中.越下面順位越高 類似語法樹
 operators = [["==", "!=", ">", "<", ">=", "<="],
              ["."],
@@ -76,11 +78,23 @@ def is_number(s):
     except ValueError:
         return False
 
+def is_bool(s):
+    if s.lower() == "true" :
+        return True
+    elif s.lower() == "false" :
+        return True   
+    else:
+        return False
+
 def getVarType(token):
-    # 回傳 變數 賦值是什麼type 字串宣告為 x$ 正常數字變數為 x 
+    # 回傳 變數 賦值是什麼type 字串宣告為 x$ 正常數字變數為 x  浮點數為 x@  布林值為x?
     if len(token) > 1:
         if token[-1] == "$":
             return "STRING"
+        elif token[-1] == "@":
+            return "FLOAT"
+        elif token[-1] == "?":
+            return "BOOL"      
     return "NUM"
 
 def isValidIdentifier(token): 
@@ -89,6 +103,10 @@ def isValidIdentifier(token):
         return False
     if len(token) > 1:
         if token[-1] == "$":
+            token = token[0:-1]
+        elif token[-1] == "@":
+            token = token[0:-1]
+        elif token[-1] == "?":
             token = token[0:-1]
     if not(token[0].lower() in "abcdefghijklmnopqrstuvwxyz"):
         return False
@@ -132,6 +150,12 @@ def lex(line):
         if is_number(value):
             token[0] = float(token[0])
             token[1] = "NUM" #Number
+        elif is_bool(value):
+            if value.lower() == "true":
+                token[0] = True
+            else:
+                token[0] = False
+            token[1] = "BOOL" #Boolean
         elif value.upper() in reserved:
             #確認是不是在reserved中，有的話轉大寫
             token[0] = value.upper()
@@ -185,6 +209,8 @@ def executeTokens(tokens):
             stopExecution = True
         elif command == "EXIT":
             quit()
+        elif command == "STOP":
+            return
         elif command == "CLEAR":
             maxLine = 0
             lines = {}
@@ -203,6 +229,10 @@ def executeTokens(tokens):
                         if token[1] == "NUM":
                             tokenVal = getNumberPrintFormat(token[0])
                         elif token[1] == "STRING":
+                            tokenVal = f"\"{token[0]}\""
+                        elif token[1] == "FLOAT":
+                            tokenVal = getNumberPrintFormat(token[0])
+                        elif token[1] == "BOOL":
                             tokenVal = f"\"{token[0]}\""
                         else:
                             tokenVal = token[0]
@@ -249,9 +279,6 @@ def executeTokens(tokens):
 def saveHandler(tokens):
     i = 0
     filename = tokens[0][0]
-    #如果沒有標註附檔名，就都改.tb檔
-    if "." not in filename:
-        filename += ".tb"
     f = open(filename, 'w')
     while i <= maxLine:
         if i in lines:
@@ -278,9 +305,6 @@ def loadHandler(tokens):
     lines = {}
     identifiers = {}
     filename = tokens[0][0]
-    #如果沒有標註附檔名，就都改.tb檔
-    if "." not in filename:
-        filename += ".tb"
     f = open(filename, 'r')
     for line in f.readlines():
         if len(line) > 0:
@@ -464,6 +488,12 @@ def inputHandler(tokens):
         if getVarType(varName) == "STRING":
             identifiers[varName] = [varValue, "STRING"]
             break
+        elif getVarType(varName) == "FLOAT":
+            identifiers[varName] = [varValue, "FLOAT"]
+            break
+        elif getVarType(varName) == "BOOL":
+            identifiers[varName] = [varValue, "BOOL"]
+            break
         else:
             if is_number(varValue):
                 identifiers[varName] = [varValue, "NUM"]
@@ -526,8 +556,12 @@ def letHandler(tokens):
     if varValue == None:
         return
     if getVarType(varName) != varValue[1]:
-        print(f"Error: Variable {varName} type mismatch.")
-        return
+        if(getVarType(varName)=="FLOAT" and varValue[1]=="NUM"):
+            identifiers[varName] = varValue
+            return True
+        else:
+            print(f"Error: Variable {varName} type mismatch.")
+            return
     identifiers[varName] = varValue
     return True
 
@@ -560,12 +594,12 @@ def solveExpression(tokens, level):
     rightSideValues = []
     if level < len(operators):
         for i in range(0, len(tokens)):
-            if not(tokens[i][1] in ["OP", "NUM", "STRING", "ID", "MF"]):
+            if not(tokens[i][1] in ["OP", "NUM", "STRING", "ID", "FLOAT", "BOOL", "MF"]):
                 print(f"Error: Unknown operand {tokens[i][0]}")
                 return None
             elif tokens[i][1] == "MF" and tokens[i][0] in MathFunction[level]:
                 if tokens[i+1][1] != "NUM":
-                    print("Error: NUM expects value in ().")
+                    print("Error: NUM expects value in " +tokens[i][0]+ " ().")
                     return None
                 if tokens[i][0] == "ABS":
                     leftSideValues.append([abs(tokens[i+1][0]), "NUM"])
@@ -703,6 +737,8 @@ def solveExpression(tokens, level):
                         return None
                     elif exprResL[1] == "NUM" and exprResR[1] == "NUM":
                         return [(exprResL[0]) and (exprResR[0]), "NUM"]
+                    elif exprResL[1] == "BOOL" and exprResR[1] == "BOOL":
+                        return [(exprResL[0]) and (exprResR[0]), "BOOL"]
                     else:
                         print("Error: Operand type mismatch.")
                         return None
@@ -712,6 +748,8 @@ def solveExpression(tokens, level):
                         return None
                     elif exprResL[1] == "NUM" and exprResR[1] == "NUM":
                         return [(exprResL[0]) or (exprResR[0]), "NUM"]
+                    elif exprResL[1] == "BOOL" and exprResR[1] == "BOOL":
+                        return [(exprResL[0]) or (exprResR[0]), "BOOL"]
                     else:
                         print("Error: Operand type mismatch.")
                         return None
