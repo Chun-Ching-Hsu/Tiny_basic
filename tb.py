@@ -210,7 +210,14 @@ def executeTokens(tokens):
         elif command == "EXIT":
             quit()
         elif command == "STOP":
-            return
+            next = input()
+            while True:
+                if next.upper() == "RUN":
+                    return 
+                elif next.upper() == "QUIT":
+                    quit()
+                else:
+                    next = input()
         elif command == "CLEAR":
             maxLine = 0
             lines = {}
