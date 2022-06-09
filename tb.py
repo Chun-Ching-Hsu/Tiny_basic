@@ -20,6 +20,7 @@
 
 from operator import truediv
 from math import cos, sin
+from tracemalloc import start
 
 VERSION = 1
 #第一行的command 有hander處理
@@ -35,7 +36,7 @@ operators = [["==", "!=", ">", "<", ">=", "<="],
              ["+", "-" ,">>","<<"],
              ["*", "/", "&", "|", "%"],
              ["^"]]
-MathFunction = ["SIN", "COS", "ABS"]
+MathFunction = ["SIN", "COS", "ABS","MAX","MIN"]
 lines = {}  #暫存命令列 行號是key index 是 [命令,type]
 array = {}  #儲存array  key是名稱 index 是[]
 maxLine = 0
@@ -605,17 +606,57 @@ def solveExpression(tokens, level):
                 print(f"Error: Unknown operand {tokens[i][0]}")
                 return None
             elif tokens[i][1] == "MF" and tokens[i][0] in MathFunction[level]:
-                if tokens[i+1][1] != "NUM":
+                if tokens[i+1][1] != "NUM" and tokens[i+1][1] != "ID":
                     print("Error: NUM expects value in " +tokens[i][0]+ " ().")
                     return None
                 if tokens[i][0] == "ABS":
-                    leftSideValues.append([abs(tokens[i+1][0]), "NUM"])
+                    if tokens[i+1][1] == "NUM":
+                        leftSideValues.append([abs(tokens[i+1][0]), "NUM"])
+                    elif tokens[i+1][1] == "ID":
+                        print(getIdentifierValue(tokens[i+1][0]))
+                        leftSideValues.append([abs(getIdentifierValue(tokens[i+1][0])[0]), "NUM"])
                     i=i+1
                 elif tokens[i][0] == "SIN":
-                    leftSideValues.append([sin(tokens[i+1][0]), "NUM"])
+                    if tokens[i+1][1] == "NUM":
+                        leftSideValues.append([abs(tokens[i+1][0]), "NUM"])
+                    elif tokens[i+1][1] == "ID":
+                        print(getIdentifierValue(tokens[i+1][0]))
+                        leftSideValues.append([sin(getIdentifierValue(tokens[i+1][0])[0]), "NUM"])
                     i=i+1
                 elif tokens[i][0] == "COS":
-                    leftSideValues.append([cos(tokens[i+1][0]), "NUM"])
+                    if tokens[i+1][1] == "NUM":
+                        leftSideValues.append([abs(tokens[i+1][0]), "NUM"])
+                    elif tokens[i+1][1] == "ID":
+                        print(getIdentifierValue(tokens[i+1][0]))
+                        leftSideValues.append([cos(getIdentifierValue(tokens[i+1][0])[0]), "NUM"])
+                    i=i+1
+                elif tokens[i][0] == "MAX":
+                    tmp = 0 
+                    start = 0
+                    loc = i
+                    while start < len(tokens) - i - 1 : 
+                            if tokens[loc+1][1] == "NUM" :
+                                val = tokens[loc+1] 
+                            elif tokens[loc+1][1] == "ID" :
+                                val = getIdentifierValue(tokens[loc+1][0])
+                            tmp = max(tmp,val[0])
+                            start += 1
+                            loc += 1
+                    leftSideValues.append([tmp, "NUM"])
+                    i=i+1
+                elif tokens[i][0] == "MIN":
+                    tmp = 0 
+                    start = 0
+                    loc = i
+                    while start < len(tokens) - i - 1 : 
+                            if tokens[loc+1][1] == "NUM" :
+                                val = tokens[loc+1] 
+                            elif tokens[loc+1][1] == "ID" :
+                                val = getIdentifierValue(tokens[loc+1][0])
+                            tmp = min(tmp,val[0])
+                            start += 1
+                            loc += 1
+                    leftSideValues.append([tmp, "NUM"])
                     i=i+1
             elif tokens[i][1] == "OP" and tokens[i][0] in operators[level]:
                 exprResL = None
