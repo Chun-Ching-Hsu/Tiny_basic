@@ -1,0 +1,6 @@
+1 print 1
+2 print 2
+3 stop 
+4 print 3
+5 stop
+6 print 4 
