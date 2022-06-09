@@ -17,6 +17,7 @@
 #20220517 新增 BOOL X?
 #20220519 新增 STOP
 #20220519 新增 FLOAT X@
+#20220609 新增MAX,MIN
 
 from operator import truediv
 from math import cos, sin
