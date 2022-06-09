@@ -1,0 +1,2 @@
+1 LET x = 100  
+2 print MAX x 2 6 5 8 9
