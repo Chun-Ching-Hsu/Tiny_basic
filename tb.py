@@ -22,6 +22,7 @@
 from operator import truediv
 from math import cos, sin
 from tracemalloc import start
+import sys
 
 VERSION = 1
 #第一行的command 有hander處理
@@ -632,7 +633,7 @@ def solveExpression(tokens, level):
                         leftSideValues.append([cos(getIdentifierValue(tokens[i+1][0])[0]), "NUM"])
                     i=i+1
                 elif tokens[i][0] == "MAX":
-                    tmp = 0 
+                    tmp = -sys.maxsize -1 
                     start = 0
                     loc = i
                     while start < len(tokens) - i - 1 : 
@@ -646,7 +647,7 @@ def solveExpression(tokens, level):
                     leftSideValues.append([tmp, "NUM"])
                     i=i+1
                 elif tokens[i][0] == "MIN":
-                    tmp = 0 
+                    tmp = sys.maxsize
                     start = 0
                     loc = i
                     while start < len(tokens) - i - 1 : 
