@@ -22,7 +22,6 @@
 from operator import truediv
 from math import cos, sin
 from tracemalloc import start
-import sys
 
 VERSION = 1
 #第一行的command 有hander處理
@@ -620,20 +619,20 @@ def solveExpression(tokens, level):
                     i=i+1
                 elif tokens[i][0] == "SIN":
                     if tokens[i+1][1] == "NUM":
-                        leftSideValues.append([abs(tokens[i+1][0]), "NUM"])
+                        leftSideValues.append([sin(tokens[i+1][0]), "NUM"])
                     elif tokens[i+1][1] == "ID":
                         print(getIdentifierValue(tokens[i+1][0]))
                         leftSideValues.append([sin(getIdentifierValue(tokens[i+1][0])[0]), "NUM"])
                     i=i+1
                 elif tokens[i][0] == "COS":
                     if tokens[i+1][1] == "NUM":
-                        leftSideValues.append([abs(tokens[i+1][0]), "NUM"])
+                        leftSideValues.append([cos(tokens[i+1][0]), "NUM"])
                     elif tokens[i+1][1] == "ID":
                         print(getIdentifierValue(tokens[i+1][0]))
                         leftSideValues.append([cos(getIdentifierValue(tokens[i+1][0])[0]), "NUM"])
                     i=i+1
                 elif tokens[i][0] == "MAX":
-                    tmp = -sys.maxsize - 1 
+                    tmp = 0 
                     start = 0
                     loc = i
                     while start < len(tokens) - i - 1 : 
@@ -647,7 +646,7 @@ def solveExpression(tokens, level):
                     leftSideValues.append([tmp, "NUM"])
                     i=i+1
                 elif tokens[i][0] == "MIN":
-                    tmp = sys.maxsize
+                    tmp = 0 
                     start = 0
                     loc = i
                     while start < len(tokens) - i - 1 : 
